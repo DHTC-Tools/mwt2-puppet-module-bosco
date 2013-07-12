@@ -6,6 +6,7 @@ define bosco::gatekeeper($org = $title, $bosco_port, $remote_schedd, $local_sche
   # Home directory structure local to MWT2
   $install_prefix = "/home/tier3/$org"
   $bosco_username = "tier3.$org"
+  $bosco_groupname = "t3opp"
   
   # Download and install Bosco
   exec { "${title}-boscoinstaller":
@@ -13,7 +14,6 @@ define bosco::gatekeeper($org = $title, $bosco_port, $remote_schedd, $local_sche
     path     => '/usr/bin:/bin:/usr/sbin:/sbin',
     command  => "/bin/bash -c 'cd $install_prefix; wget ftp://ftp.cs.wisc.edu/condor/bosco/1.2/boscoinstaller; chmod +x boscoinstaller; ./boscoinstaller --prefix=$install_prefix/bosco'",
     unless   => "test -d $install_prefix/bosco",
-    require  => Class['user::t3opp'], # Also local to MWT2
   }
  
   # This file contains overrides to BOSCO's condor configuration to release the
@@ -21,7 +21,7 @@ define bosco::gatekeeper($org = $title, $bosco_port, $remote_schedd, $local_sche
   file { "$install_prefix/bosco/local.${::hostname}/config/condor_config.override": 
     source  => "puppet:///modules/bosco/condor_config.override",
     owner   => "$bosco_username",
-    group   => "t3opp", # statically defined for MWT2
+    group   => "$bosco_groupname", # statically defined for MWT2
     mode    => 644,
     require => Exec["${title}-boscoinstaller"], 
   }
@@ -35,7 +35,7 @@ define bosco::gatekeeper($org = $title, $bosco_port, $remote_schedd, $local_sche
   file { "$install_prefix/bosco/local.${::hostname}/config/condor_config.local.bosco": 
     content => "BOSCO_PORT = $bosco_port \nFLOCK_FROM = $remote_schedd\nALLOW_ADVERTISE_SCHEDD = */$(FLOCK_FROM) $(FULL_HOSTNAME) $(IP_ADDRESS)",
     owner  => "$bosco_username",
-    group  => "t3opp",
+    group  => "$bosco_groupname",
     mode   => 644,
     require => Exec["${title}-boscoinstaller"],
   }
@@ -55,7 +55,7 @@ define bosco::gatekeeper($org = $title, $bosco_port, $remote_schedd, $local_sche
   # Inject the accounting group into the job. By default is group_bosco.<user>
   file { "$install_prefix/bosco/glite/bin/condor_local_submit_attributes.sh":
     owner   => "$bosco_username",
-    group   => "t3opp",
+    group   => "$bosco_groupname",
     mode    => 755,
     content => "#!/bin/sh \necho \"+AccountingGroup = \\\"group_bosco.$bosco_username\\\"\"",
     require => Exec["${title}-boscoaddcluster"],
