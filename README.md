@@ -16,7 +16,7 @@ Tier 3 centers can easily acquire 500+ CPUs without ever leaving their home
 environment.
 
 ## Usage
-> bosco::gatekeeper {"uc" : bosco_port => 11013, remote_schedd => 'uct3-s1.uchicago.edu', local_schedd => 'uct2-gk.mwt2.org'}
+> bosco::gatekeeper {"uc" : bosco_port => 11000, remote_schedd => 'uct3-schedd.uchicago.edu', local_schedd => 'uct2-gatekeeper.mwt2.org'}
 
 ## Potential pitfalls
 This puppet module assumes that you have host-based authentication set up
