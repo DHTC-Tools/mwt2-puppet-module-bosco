@@ -21,7 +21,7 @@ define bosco::gatekeeper($org = $title, $bosco_port, $remote_schedd, $local_sche
   file { "$install_prefix/bosco/local.${::hostname}/config/condor_config.override": 
     source  => "puppet:///modules/bosco/condor_config.override",
     owner   => "$bosco_username",
-    group   => "$bosco_groupname", # statically defined for MWT2
+    group   => "$bosco_groupname",
     mode    => 644,
     require => Exec["${title}-boscoinstaller"], 
   }
